@@ -1,0 +1,76 @@
+resources:
+  - name: cluster-git
+    type: git
+    source:
+      uri: git@github.com:sahlinet/cicd-image
+      branch: ci-image
+      private_key: |
+        ((github-key.key))
+
+  - name: ci-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/cicd-image
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+  - name: version
+    type: semver
+    source:
+      driver: git
+      uri: git@github.com:sahlinet/cicd-image
+      branch: develop
+      private_key: |
+        ((github-key.key))
+
+jobs:
+  - name: build-and-push
+    plan:
+      - get: cluster-git
+        trigger: true
+      - get: version
+        trigger: true
+      - task: build-task-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+          inputs:
+            - name: cluster-git
+          outputs:
+            - name: image
+          params:
+            CONTEXT: cluster-git/ci/Dockerfiles/doctl/
+            TAG: version/version
+          run:
+            path: build
+      - put: ci-image
+        params:
+          image: image/image.tar
+          version: version/version
+
+  - name: release-build
+    plan:
+      - get: version
+        params: { bump: build }
+      - put: version
+        params: { file: version/version }
+
+  - name: release-minor
+    plan:
+      - get: version
+        params: { bump: minor }
+      - put: version
+        params: { file: version/version }
+
+  - name: release-major
+    plan:
+      - get: version
+        params: { bump: major }
+      - put: version
+        params: { file: version/version }
