@@ -67,11 +67,6 @@ jobs:
         params:
           repository: repo
 
-  #      - put: repo
-  #        params:
-  #          repository: repo
-  #          force: false
-  #          #tag_only: true
   - name: release-rc
     plan:
       - get: version
