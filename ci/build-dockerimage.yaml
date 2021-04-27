@@ -1,9 +1,17 @@
 resources:
-  - name: cluster-git
+  - name: repo
     type: git
     source:
       uri: git@github.com:sahlinet/cicd-image
-      branch: ci-image
+      branch: develop
+      private_key: |
+        ((github-key.key))
+
+  - name: repo-main
+    type: git
+    source:
+      uri: git@github.com:sahlinet/cicd-image
+      branch: main
       private_key: |
         ((github-key.key))
 
@@ -14,21 +22,23 @@ resources:
       repository: philipsahli/cicd-image
       username: ((docker.username))
       password: ((docker.password))
-      tag: latest
 
   - name: version
     type: semver
     source:
       driver: git
-      uri: git@github.com:sahlinet/cicd-image
+      uri: git@github.com:sahlinet/versions
+      initial_version: 0.1.0
       branch: develop
+      file: version-ci-image
       private_key: |
         ((github-key.key))
 
 jobs:
-  - name: build-and-push
+  - name: build-image-and-push
     plan:
-      - get: cluster-git
+      - get: repo-main
+      - get: repo
         trigger: true
       - get: version
         trigger: true
@@ -41,36 +51,48 @@ jobs:
             source:
               repository: vito/oci-build-task
           inputs:
-            - name: cluster-git
+            - name: repo
           outputs:
             - name: image
           params:
-            CONTEXT: cluster-git/ci/Dockerfiles/doctl/
-            TAG: version/version
+            DOCKERFILE: repo/Dockerfile
           run:
             path: build
       - put: ci-image
         params:
           image: image/image.tar
-          version: version/version
+          additional_tags: version/number
 
-  - name: release-build
+      - put: repo-main
+        params:
+          repository: repo
+
+  #      - put: repo
+  #        params:
+  #          repository: repo
+  #          force: false
+  #          #tag_only: true
+  - name: release-rc
     plan:
       - get: version
-        params: { bump: build }
+        params: { pre: rc }
       - put: version
-        params: { file: version/version }
-
+        params: { file: version/number }
+  - name: release-patch
+    plan:
+      - get: version
+        params: { bump: patch }
+      - put: version
+        params: { file: version/number }
   - name: release-minor
     plan:
       - get: version
         params: { bump: minor }
       - put: version
-        params: { file: version/version }
-
+        params: { file: version/number }
   - name: release-major
     plan:
       - get: version
         params: { bump: major }
       - put: version
-        params: { file: version/version }
+        params: { file: version/number }
