@@ -39,7 +39,6 @@ jobs:
     plan:
       - get: repo-main
       - get: repo
-        trigger: true
       - get: version
         trigger: true
       - task: build-task-image
