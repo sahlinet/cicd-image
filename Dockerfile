@@ -9,3 +9,5 @@ RUN mv doctl /app
 RUN wget https://github.com/cli/cli/releases/download/v1.9.2/gh_1.9.2_linux_amd64.deb
 RUN dpkg -i gh_1.9.2_linux_amd64.deb && rm *.deb
 RUN gh config set prompt enabled 
+
+RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.1
