@@ -1,0 +1,64 @@
+resources:
+  - name: repo-tfe-resource
+    type: git
+    source:
+      uri: git@github.com:orstensemantics/concourse-tfe-resource
+      branch: master
+      private_key: |
+        ((github-key.key))
+
+  - name: concourse-tfe-resource-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/concourse-tfe-resource
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+  - name: golang-alpine-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: golang
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: alpine
+
+  - name: alpine-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: alpine
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+jobs:
+  - name: build-image-and-push
+    plan:
+      - get: repo-tfe-resource
+      - get: golang-alpine-image
+        trigger: true
+      - get: alpine-image
+        trigger: true
+      - task: build-task-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+          inputs:
+            - name: repo-tfe-resource
+          outputs:
+            - name: image
+          params:
+            DOCKERFILE: repo-tfe-resource/Dockerfile
+            CONTEXT: repo-tfe-resource
+          run:
+            path: build
+      - put: concourse-tfe-resource-image
+        params:
+          image: image/image.tar
