@@ -1,0 +1,68 @@
+resources:
+  - name: every-120m
+    type: time
+    icon: clock-outline
+    source:
+      interval: 120m
+
+  - name: ci-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/cicd-image
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: 0.8.0
+
+  - name: tfe-resource
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/concourse-tfe-resource
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+jobs:
+  - name: scan-cicd-image
+    plan:
+      - get: every-120m
+        trigger: true
+      - get: ci-image
+      - in_parallel:
+          - task: run-trivy
+            privileged: true
+            config:
+              platform: linux
+              image_resource:
+                type: registry-image
+                source:
+                  repository: philipsahli/cicd-image
+              run:
+                path: sh
+                args:
+                  - -exc
+                  - |
+                    trivy image --exit-code 1 philipsahli/cicd-image:0.8.0
+
+  - name: scan-tfe-resource
+    plan:
+      - get: every-120m
+        trigger: true
+      - get: ci-image
+      - get: tfe-resource
+      - in_parallel:
+          - task: run-trivy
+            privileged: true
+            config:
+              platform: linux
+              image_resource:
+                type: registry-image
+                source:
+                  repository: philipsahli/cicd-image
+              run:
+                path: sh
+                args:
+                  - -exc
+                  - |
+                    trivy image --exit-code 1 philipsahli/concourse-tfe-resource
