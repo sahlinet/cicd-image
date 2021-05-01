@@ -1,6 +1,7 @@
 resources:
   - name: repo-tfe-resource
     type: git
+    icon: github
     source:
       uri: git@github.com:orstensemantics/concourse-tfe-resource
       branch: master
