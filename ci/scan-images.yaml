@@ -46,7 +46,7 @@ jobs:
             privileged: true
             file: cicd-repo/ci/tasks/run-trivy.yaml
             vars:
-              IMAGE: philipsahli/cicd-image:0.9.0-rc.1
+              IMAGE: philipsahli/cicd-image:0.10.0-rc.1
               LIMIT: 10
 
   - name: scan-tfe-resource
