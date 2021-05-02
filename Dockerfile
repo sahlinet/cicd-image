@@ -1,13 +1,14 @@
-FROM golang:1.15-buster
+FROM golang:1.15-alpine
 
 RUN mkdir /app
 
 RUN wget https://github.com/digitalocean/doctl/releases/download/v1.59.0/doctl-1.59.0-linux-amd64.tar.gz
 RUN tar xf doctl-1.59.0-linux-amd64.tar.gz && rm *tar.gz
-RUN mv doctl /app
+RUN mv doctl /usr/local/bin
 
-RUN wget https://github.com/cli/cli/releases/download/v1.9.2/gh_1.9.2_linux_amd64.deb
-RUN dpkg -i gh_1.9.2_linux_amd64.deb && rm *.deb
+RUN wget https://github.com/cli/cli/releases/download/v1.9.2/gh_1.9.2_linux_386.tar.gz -O ghcli.tar.gz
+RUN tar -C /usr --strip-components=1 -xf ghcli.tar.gz
 RUN gh config set prompt enabled 
 
+RUN apk add curl
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.1

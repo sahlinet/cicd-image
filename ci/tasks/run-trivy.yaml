@@ -1,0 +1,22 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: philipsahli/cicd-image
+
+run:
+  path: bash
+  args:
+    - -exc
+    - |
+      limit=$LIMIT
+      export TRIVY_LIGHT=true
+      export TRIVY_QUIET=true
+
+      v=`trivy image --format template --template '{{- $vulnerabilities := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}{{- $vulnerabilities = add $vulnerabilities 1 }}{{- end }}{{- end }}{{- end }}{{ $vulnerabilities}}' $IMAGE`
+      if [ $v -gt $limit ]; then
+          echo "Vulnerabilities count of $v too high" 
+          trivy image $IMAGE
+          exit 1
+      fi
+      echo "$v vulnerabilities is ok"

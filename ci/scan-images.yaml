@@ -23,27 +23,31 @@ resources:
       password: ((docker.password))
       tag: latest
 
+  - name: cicd-repo
+    type: git
+    source:
+      uri: git@github.com:sahlinet/cicd-image
+      branch: change-to-alpine
+      private_key: |
+        ((github-key.key))
+      paths:
+        - "ci/**"
+
 jobs:
   - name: scan-cicd-image
     plan:
       - get: every-120m
         trigger: true
       - get: ci-image
+      - get: cicd-repo
+        trigger: true
       - in_parallel:
           - task: run-trivy
             privileged: true
-            config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source:
-                  repository: philipsahli/cicd-image
-              run:
-                path: sh
-                args:
-                  - -exc
-                  - |
-                    trivy image --exit-code 1 philipsahli/cicd-image:0.8.0
+            file: cicd-repo/ci/tasks/run-trivy.yaml
+            params:
+              IMAGE: philipsahli/cicd-image:0.8.0
+              LIMIT: 10
 
   - name: scan-tfe-resource
     plan:
