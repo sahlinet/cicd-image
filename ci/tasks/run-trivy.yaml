@@ -1,9 +1,13 @@
 platform: linux
+
 image_resource:
   type: registry-image
   source:
     repository: philipsahli/cicd-image
 
+params:
+  IMAGE: ((IMAGE))
+  LIMIT: ((LIMIT))
 run:
   path: bash
   args:

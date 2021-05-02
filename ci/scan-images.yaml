@@ -27,7 +27,7 @@ resources:
     type: git
     source:
       uri: git@github.com:sahlinet/cicd-image
-      branch: change-to-alpine
+      branch: develop
       private_key: |
         ((github-key.key))
       paths:
@@ -45,8 +45,8 @@ jobs:
           - task: run-trivy
             privileged: true
             file: cicd-repo/ci/tasks/run-trivy.yaml
-            params:
-              IMAGE: philipsahli/cicd-image:0.8.0
+            vars:
+              IMAGE: philipsahli/cicd-image:0.9.0-rc.1
               LIMIT: 10
 
   - name: scan-tfe-resource
