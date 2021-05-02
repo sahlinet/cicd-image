@@ -33,20 +33,33 @@ resources:
       paths:
         - "ci/**"
 
+  - name: version
+    type: semver
+    source:
+      driver: git
+      uri: git@github.com:sahlinet/versions
+      branch: develop
+      file: version-ci-image
+      private_key: |
+        ((github-key.key))
+
 jobs:
   - name: scan-cicd-image
     plan:
       - get: every-120m
         trigger: true
-      - get: ci-image
       - get: cicd-repo
         trigger: true
+      - get: version
+        trigger: true
+
+      - get: ci-image
       - in_parallel:
           - task: run-trivy
             privileged: true
             file: cicd-repo/ci/tasks/run-trivy.yaml
             vars:
-              IMAGE: philipsahli/cicd-image:0.10.0-rc.1
+              IMAGE: philipsahli/cicd-image
               LIMIT: 10
 
   - name: scan-tfe-resource
