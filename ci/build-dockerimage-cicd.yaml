@@ -69,7 +69,7 @@ jobs:
   - name: release-rc
     plan:
       - get: version
-        params: { bump: minor, pre: rc }
+        params: { pre: rc }
       - put: version
         params: { file: version/number }
   - name: release-patch
