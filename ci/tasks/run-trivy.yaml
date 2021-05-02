@@ -5,6 +5,9 @@ image_resource:
   source:
     repository: philipsahli/cicd-image
 
+inputs:
+  - name: version
+
 params:
   IMAGE: ((IMAGE))
   LIMIT: ((LIMIT))
@@ -17,7 +20,9 @@ run:
       export TRIVY_LIGHT=true
       export TRIVY_QUIET=true
 
-      v=`trivy image --format template --template '{{- $vulnerabilities := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}{{- $vulnerabilities = add $vulnerabilities 1 }}{{- end }}{{- end }}{{- end }}{{ $vulnerabilities}}' $IMAGE`
+      TAG=`cat version/number`
+
+      v=`trivy image --format template --template '{{- $vulnerabilities := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}{{- $vulnerabilities = add $vulnerabilities 1 }}{{- end }}{{- end }}{{- end }}{{ $vulnerabilities}}' $IMAGE:$TAG`
       if [ $v -gt $limit ]; then
           echo "Vulnerabilities count of $v too high" 
           trivy image $IMAGE
