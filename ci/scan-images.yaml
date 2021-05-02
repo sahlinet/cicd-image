@@ -61,25 +61,3 @@ jobs:
             vars:
               IMAGE: philipsahli/cicd-image
               LIMIT: 10
-
-  - name: scan-tfe-resource
-    plan:
-      - get: every-120m
-        trigger: true
-      - get: ci-image
-      - get: tfe-resource
-      - in_parallel:
-          - task: run-trivy
-            privileged: true
-            config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source:
-                  repository: philipsahli/cicd-image
-              run:
-                path: sh
-                args:
-                  - -exc
-                  - |
-                    trivy image --exit-code 1 philipsahli/concourse-tfe-resource
