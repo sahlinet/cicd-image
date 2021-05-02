@@ -13,7 +13,7 @@ params:
   LIMIT: ((LIMIT))
 
 run:
-  path: bash
+  path: sh
   args:
     - -exc
     - |
