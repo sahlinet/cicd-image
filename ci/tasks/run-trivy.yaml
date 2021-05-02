@@ -7,6 +7,8 @@ image_resource:
 
 inputs:
   - name: version
+  - name: image
+    optional: true
 
 params:
   IMAGE: ((IMAGE))
@@ -21,9 +23,17 @@ run:
       export TRIVY_LIGHT=true
       export TRIVY_QUIET=true
 
-      TAG=`cat version/number`
+      case $IMAGE in
+          *.tar) echo running on an image file
+             TARGET="--input $IMAGE"
+          ;;
+          *) echo running on an image from a registry
+             TAG=`cat version/number`
+             TARGET="$IMAGE:$TAG"
+          ;;
+      esac
 
-      v=`trivy image --format template --template '{{- $vulnerabilities := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}{{- $vulnerabilities = add $vulnerabilities 1 }}{{- end }}{{- end }}{{- end }}{{ $vulnerabilities}}' $IMAGE:$TAG`
+      v=`trivy image --format template --template '{{- $vulnerabilities := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}{{- $vulnerabilities = add $vulnerabilities 1 }}{{- end }}{{- end }}{{- end }}{{ $vulnerabilities}}' $TARGET`
 
       if [ $v -gt $limit ]; then
           echo "Vulnerabilities count of $v too high" 
