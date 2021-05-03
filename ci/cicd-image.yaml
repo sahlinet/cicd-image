@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: git@github.com:sahlinet/cicd-image
-      branch: run-trivy-in-build-pipeline
+      branch: develop
       private_key: |
         ((github-key.key))
 
