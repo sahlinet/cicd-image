@@ -8,15 +8,6 @@ resources:
       private_key: |
         ((github-key.key))
 
-  - name: concourse-tfe-resource-image
-    type: registry-image
-    icon: docker
-    source:
-      repository: philipsahli/concourse-tfe-resource
-      username: ((docker.username))
-      password: ((docker.password))
-      tag: latest
-
   - name: ci-image
     type: registry-image
     icon: docker
@@ -25,6 +16,15 @@ resources:
       username: ((docker.username))
       password: ((docker.password))
       tag: 0.11.0
+
+  - name: concourse-tfe-resource-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/concourse-tfe-resource
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
 
   - name: golang-alpine-image
     type: registry-image
