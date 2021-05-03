@@ -8,5 +8,5 @@ RUN wget https://github.com/cli/cli/releases/download/v1.9.2/gh_1.9.2_linux_386.
 RUN tar -C /usr --strip-components=1 -xf ghcli.tar.gz && rm ghcli.tar.gz
 RUN gh config set prompt enabled 
 
-RUN apk add curl
+RUN apk add curl build-base
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.1
