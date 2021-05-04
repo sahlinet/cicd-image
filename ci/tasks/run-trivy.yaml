@@ -8,7 +8,6 @@ image_resource:
 inputs:
   - name: version
     optional: true
-  - name: image
 
 params:
   IMAGE: ((IMAGE))
