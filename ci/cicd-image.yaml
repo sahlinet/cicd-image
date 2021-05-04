@@ -1,6 +1,7 @@
 resources:
   - name: repo
     type: git
+    icon: github
     source:
       uri: git@github.com:sahlinet/cicd-image
       branch: develop
@@ -9,6 +10,7 @@ resources:
 
   - name: repo-main
     type: git
+    icon: github
     source:
       uri: git@github.com:sahlinet/cicd-image
       branch: main
@@ -25,6 +27,7 @@ resources:
 
   - name: version
     type: semver
+    icon: tag-outline
     source:
       driver: git
       uri: git@github.com:sahlinet/versions

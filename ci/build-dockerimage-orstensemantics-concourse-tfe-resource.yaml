@@ -10,6 +10,7 @@ resources:
 
   - name: repo
     type: git
+    icon: github
     source:
       uri: git@github.com:sahlinet/cicd-image
       branch: develop
