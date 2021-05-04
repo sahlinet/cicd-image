@@ -8,6 +8,14 @@ resources:
       private_key: |
         ((github-key.key))
 
+  - name: repo
+    type: git
+    source:
+      uri: git@github.com:sahlinet/cicd-image
+      branch: develop
+      private_key: |
+        ((github-key.key))
+
   - name: ci-image
     type: registry-image
     icon: docker
@@ -84,21 +92,15 @@ jobs:
       - get: every-120m
         trigger: true
       - get: ci-image
+      - get: repo
       - get: repo-tfe-resource
       - in_parallel:
           - task: run-trivy
             privileged: true
+            file: repo/ci/tasks/run-trivy.yaml
+            vars:
+              IMAGE: philipsahli/concourse-tfe-resource
+              TAG: latest
+              LIMIT: 1
             input_mapping:
               repo-tfe-resource: repo
-            config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source:
-                  repository: philipsahli/cicd-image
-              run:
-                path: sh
-                args:
-                  - -exc
-                  - |
-                    trivy image --exit-code 1 philipsahli/concourse-tfe-resource
