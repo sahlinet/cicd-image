@@ -27,7 +27,7 @@ run:
              TARGET="--input $IMAGE"
           ;;
           *) echo running on an image from a registry
-             TAG=`cat version/number`
+             TAG=`[[ ! -z "$TAG" ]] && echo "$TAG" || cat version/number`
              TARGET="$IMAGE:$TAG"
           ;;
       esac
