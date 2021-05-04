@@ -86,6 +86,7 @@ jobs:
       - get: every-120m
         trigger: true
       - get: repo
+        trigger: true
       - get: version
         trigger: true
         passed: [build-scan-and-push]
