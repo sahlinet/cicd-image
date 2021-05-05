@@ -83,6 +83,8 @@ jobs:
 
       - put: repo-main
         params:
+          tag: version/number
+          force: true
           repository: repo
 
   - name: scan-cicd-image
