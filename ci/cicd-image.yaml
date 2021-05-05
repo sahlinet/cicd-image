@@ -73,6 +73,7 @@ jobs:
         file: repo/ci/tasks/run-trivy.yaml
         vars:
           IMAGE: image/image.tar
+          TAG: ""
           LIMIT: 10
 
       - put: ci-image
