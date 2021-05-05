@@ -1,0 +1,96 @@
+resources:
+  - name: repo-resource
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:philipsahli/concourse-bitbucket-pullrequest-resource
+      branch: use-alpine-tag
+      private_key: |
+        ((github-key.key))
+
+  - name: repo
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:sahlinet/cicd-image
+      branch: develop
+      private_key: |
+        ((github-key.key))
+
+  - name: ci-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/cicd-image
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: 0.11.0
+
+  - name: concourse-resource-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: philipsahli/concourse-bitbucket-pullrequest-resource
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+  - name: alpine-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: alpine
+      username: ((docker.username))
+      password: ((docker.password))
+      tag: latest
+
+  - name: every-120m
+    type: time
+    icon: clock-outline
+    source:
+      interval: 120m
+
+jobs:
+  - name: build-image-and-push
+    plan:
+      - get: repo-resource
+      - get: alpine-image
+        trigger: true
+      - task: build-task-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+          inputs:
+            - name: repo-resource
+          outputs:
+            - name: image
+          params:
+            DOCKERFILE: repo-resource/Dockerfile
+            CONTEXT: repo-resource
+          run:
+            path: build
+      - put: concourse-resource-image
+        params:
+          image: image/image.tar
+
+  - name: scan-resource
+    plan:
+      - get: every-120m
+        trigger: true
+      - get: ci-image
+      - get: repo
+      - get: repo-resource
+      - in_parallel:
+          - task: run-trivy
+            privileged: true
+            file: repo/ci/tasks/run-trivy.yaml
+            vars:
+              IMAGE: philipsahli/concourse-bitbucket-pullrequest-resource
+              TAG: latest
+              LIMIT: 7
+            input_mapping:
+              repo-resource: repo

@@ -1,3 +1,4 @@
+---
 resources:
   - name: repo
     type: git
@@ -16,6 +17,13 @@ resources:
       branch: main
       private_key: |
         ((github-key.key))
+
+  - name: pull-request
+    type: pull-request
+    icon: source-pull
+    source:
+      repository: sahlinet/cicd-image
+      access_token: ((github-access.token))
 
   - name: ci-image
     type: registry-image
@@ -132,3 +140,46 @@ jobs:
         params: { bump: major }
       - put: version
         params: { file: version/number }
+
+  - name: pull-requests
+    plan:
+      - get: repo
+      - get: pull-request
+        trigger: true
+
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+
+      - task: build
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+          inputs:
+            - name: repo
+          outputs:
+            - name: image
+          params:
+            DOCKERFILE: repo/Dockerfile
+          run:
+            path: build
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+
+      - put: pull-request
+        params:
+          path: pull-request
+          status: success
+
+resource_types:
+  - name: pull-request
+    type: registry-image
+    source: { repository: teliaoss/github-pr-resource }
