@@ -10,3 +10,7 @@ RUN gh config set prompt enabled
 
 RUN apk add curl build-base
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.17.1
+
+RUN wget https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz
+RUN tar -zxvf helm-v3.5.4-linux-amd64.tar.gz
+RUN mv linux-amd64/helm /usr/local/bin/helm
