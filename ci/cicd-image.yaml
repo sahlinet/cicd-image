@@ -85,6 +85,7 @@ jobs:
         params:
           tag: version/number
           force: true
+          tag_prefix: "v"
           repository: repo
 
   - name: scan-cicd-image
