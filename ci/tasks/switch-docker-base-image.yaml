@@ -1,0 +1,37 @@
+# - task: switch base image
+#   image: <your-registry>/busybox
+#   file: ci/switch-docker-base-image.yaml
+#   input_mapping: {context: dockerfile-repo}
+#   vars:
+#     BUILD_IMAGE: golang
+#     BASE_IMAGE: alpine
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: busybox
+
+inputs:
+  - name: context
+outputs:
+  - name: context-updated
+
+params:
+  BUILD_IMAGE: ((BUILD_IMAGE))
+  BASE_IMAGE: ((BASE_IMAGE))
+
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+
+      cp -rpT context context-updated
+
+      cd context-updated
+      sed -i "1 s|FROM [a-z:]*|FROM $BUILD_IMAGE|1" Dockerfile
+      sed -i "2,$ s|FROM .*|FROM $BASE_IMAGE|" Dockerfile
+
+      diff ../context/Dockerfile Dockerfile  || exit 0
