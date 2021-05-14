@@ -67,6 +67,7 @@ jobs:
         trigger: true
       - get: alpine-image
         trigger: true
+
       - task: build-task-image
         privileged: true
         config:
@@ -95,6 +96,7 @@ jobs:
       - get: ci-image
       - get: repo
       - get: repo-tfe-resource
+
       - in_parallel:
           - task: run-trivy
             privileged: true
