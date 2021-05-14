@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine
+FROM golang:1.16-alpine
 
 RUN wget https://github.com/digitalocean/doctl/releases/download/v1.59.0/doctl-1.59.0-linux-amd64.tar.gz \
     && tar xf doctl-1.59.0-linux-amd64.tar.gz \
