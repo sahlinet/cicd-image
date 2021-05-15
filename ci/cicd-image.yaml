@@ -154,11 +154,10 @@ jobs:
 
   - name: pull-requests
     plan:
-      - get: repo
-      - get: trivy-version
       - get: pull-request
         trigger: true
         version: every
+      - get: trivy-version
 
       - put: pull-request
         params:
