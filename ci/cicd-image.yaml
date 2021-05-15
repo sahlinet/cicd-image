@@ -65,6 +65,10 @@ jobs:
       - get: repo
       - get: version
         trigger: true
+      - get: trivy-version
+
+      - task: fill-versions
+        file: repo/ci/tasks/fill-trivy-version.yaml
 
       - task: build
         privileged: true
@@ -151,8 +155,10 @@ jobs:
   - name: pull-requests
     plan:
       - get: repo
+      - get: trivy-version
       - get: pull-request
         trigger: true
+        version: every
 
       - put: pull-request
         params:
@@ -160,21 +166,7 @@ jobs:
           status: pending
 
       - task: fill-versions
-        config:
-          platform: linux
-          inputs:
-            - name: trivy-version
-          outputs:
-            - name: build-params
-          image_resource:
-            type: docker-image
-            source: { repository: busybox }
-          run:
-            path: /bin/sh
-            args:
-              - -c
-              - |
-                echo "TRIVY_VERSION=`cat trivy-version/.git/ref`" > build-params/build-params
+        file: pull-request/ci/tasks/fill-trivy-version.yaml
 
       - task: build
         privileged: true
@@ -185,12 +177,12 @@ jobs:
             source:
               repository: vito/oci-build-task
           inputs:
-            - name: repo
+            - name: pull-request
             - name: build-params
           outputs:
             - name: image
           params:
-            DOCKERFILE: repo/Dockerfile
+            DOCKERFILE: pull-request/Dockerfile
             BUILD_ARGS_FILE: build-params/build-params
           run:
             path: build
