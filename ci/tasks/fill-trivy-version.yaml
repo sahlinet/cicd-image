@@ -1,0 +1,17 @@
+platform: linux
+
+inputs:
+- name: trivy-version
+outputs:
+- name: build-params
+
+image_resource:
+  type: docker-image
+  source: { repository: busybox }
+
+run:
+  path: /bin/sh
+  args:
+    - -c
+    - |
+    echo "TRIVY_VERSION=`cat trivy-version/.git/ref`" > build-params/build-params
