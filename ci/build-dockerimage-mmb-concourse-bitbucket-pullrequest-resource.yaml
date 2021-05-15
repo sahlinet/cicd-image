@@ -24,7 +24,7 @@ resources:
       repository: philipsahli/cicd-image
       username: ((docker.username))
       password: ((docker.password))
-      tag: 	0.12.1-rc.5
+      tag: 0.13.0
 
   - name: concourse-resource-image
     type: registry-image

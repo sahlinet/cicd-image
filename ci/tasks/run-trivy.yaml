@@ -4,6 +4,7 @@ image_resource:
   type: registry-image
   source:
     repository: philipsahli/cicd-image
+    tag: 0.13.0
 
 inputs:
   - name: version

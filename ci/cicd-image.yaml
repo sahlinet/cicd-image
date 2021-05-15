@@ -30,6 +30,7 @@ resources:
     icon: docker
     source:
       repository: philipsahli/cicd-image
+      tag: 0.13.0
       username: ((docker.username))
       password: ((docker.password))
 

@@ -12,7 +12,7 @@ resources:
       repository: philipsahli/cicd-image
       username: ((docker.username))
       password: ((docker.password))
-      tag: 0.9.0-rc.1
+      tag: 0.13.0
 
   - name: tfe-resource
     type: registry-image
