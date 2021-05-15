@@ -25,6 +25,8 @@ run:
       export TRIVY_LIGHT=true
       export TRIVY_QUIET=true
 
+      echo "Using trivy version: \n---\n`trivy --version`\n---"
+
       case $IMAGE in
           *.tar) echo running on an image file
              TARGET="--input $IMAGE"
