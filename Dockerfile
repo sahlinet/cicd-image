@@ -12,7 +12,7 @@ RUN wget https://github.com/cli/cli/releases/download/v1.9.2/gh_1.9.2_linux_386.
     && rm ghcli.tar.gz \
     && gh config set prompt enabled 
 
-RUN apk add --no-cache curl build-base openssh-client git
+RUN apk add --no-cache curl build-base openssh-client git jq
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin ${TRIVY_VERSION}
 
 RUN wget https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz \
