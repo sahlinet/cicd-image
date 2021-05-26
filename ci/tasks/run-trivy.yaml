@@ -41,7 +41,7 @@ run:
 
       if [ $v -gt $limit ]; then
           echo "Vulnerabilities count of $v too high" 
-          trivy image $IMAGE
+          trivy image $TARGET
           exit 1
       fi
 
