@@ -6,12 +6,14 @@ image_resource:
 
 inputs:
   - name: trivy-version
+  - name: golangci-lint-version
 outputs:
   - name: build-params
 
 run:
   path: /bin/sh
   args:
-    - -c
+    - -ec
     - |
       echo "TRIVY_VERSION=`cat trivy-version/.git/ref`" > build-params/build-params
+      echo "GOLANGCI_LINT_VERSION=`cat golangci-lint-version/.git/ref`" >> build-params/build-params

@@ -58,6 +58,13 @@ resources:
       uri: https://github.com/aquasecurity/trivy
       tag_filter: v*[0-9].*[0-9].*[0-9]
 
+  - name: golangci-lint-version
+    type: git
+    icon: tag-outline
+    source:
+      uri: https://github.com/golangci/golangci-lint
+      tag_filter: v*[0-9].*[0-9].*[0-9]
+
 jobs:
   - name: build-scan-and-push
     plan:
@@ -66,9 +73,10 @@ jobs:
       - get: version
         trigger: true
       - get: trivy-version
+      - get: golangci-lint-version
 
       - task: fill-versions
-        file: repo/ci/tasks/fill-trivy-version.yaml
+        file: repo/ci/tasks/fill-versions.yaml
 
       - task: build
         privileged: true
@@ -157,15 +165,17 @@ jobs:
       - get: pull-request
         trigger: true
         version: every
-      - get: trivy-version
 
       - put: pull-request
         params:
           path: pull-request
           status: pending
 
+      - get: trivy-version
+      - get: golangci-lint-version
+
       - task: fill-versions
-        file: pull-request/ci/tasks/fill-trivy-version.yaml
+        file: pull-request/ci/tasks/fill-versions.yaml
 
       - task: build
         privileged: true

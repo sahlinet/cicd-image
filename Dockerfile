@@ -1,6 +1,7 @@
 FROM golang:1.15-alpine
 
 ARG TRIVY_VERSION
+ARG GOLANGCI_LINT_VERSION
 
 RUN wget https://github.com/digitalocean/doctl/releases/download/v1.59.0/doctl-1.59.0-linux-amd64.tar.gz \
     && tar xf doctl-1.59.0-linux-amd64.tar.gz \
@@ -19,3 +20,5 @@ RUN wget https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz \
     && tar -zxvf helm-v3.5.4-linux-amd64.tar.gz \
     && mv linux-amd64/helm /usr/local/bin/helm \
     && rm helm*.tar.gz
+
+RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION}
